@@ -1,7 +1,5 @@
 use burn::{
-    tensor::backend::Backend,
-    module::Module,
-    nn::conv::{Conv2d, Conv2dConfig}, prelude::*,
+    nn::conv::{Conv2d, Conv2dConfig}, prelude::*, tensor::backend::Backend
 };
 
 /*
@@ -24,6 +22,7 @@ pub struct PatchEmbedding<B: Backend> {
 #[derive(Debug, Config)]
 pub struct PatchEmbeddingConfig {
     patch_size: usize,
+    #[config(default = 768)]
     embedding_dim: usize, 
     in_channels: usize,
 }

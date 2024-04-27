@@ -4,6 +4,7 @@ use burn::{
     nn::{Dropout, DropoutConfig}, prelude::*, tensor::backend::Backend
 };
 
+#[derive(Debug, Module)]
 pub struct PositionalEmbedding<B: Backend> {
     positional_embedding_matrix: Tensor::<B, 2, Float>,
     dropout: Dropout

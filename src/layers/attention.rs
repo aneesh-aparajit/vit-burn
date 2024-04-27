@@ -40,8 +40,7 @@ impl<B: Backend> SelfAttention<B> {
 
         let [_, _, head_dim] = q.dims();
 
-        let mut attention = softmax(
-            q.clone().matmul(k.permute([0, 2, 1])) / (head_dim as f64).sqrt(), 2);
+        let mut attention = softmax(q.clone().matmul(k.permute([0, 2, 1])) / (head_dim as f64).sqrt(), 2);
         attention = attention.matmul(v);
         return attention
     }

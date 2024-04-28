@@ -1,10 +1,10 @@
+use super::layers::{encoder, patch_embedding, pooler, position_embedding};
 use burn::{
-    config::Config, 
-    module::Module, 
-    nn::{LayerNorm, LayerNormConfig}, 
-    tensor::{backend::Backend, Tensor}
+    config::Config,
+    module::Module,
+    nn::{LayerNorm, LayerNormConfig},
+    tensor::{backend::Backend, Tensor},
 };
-use super::layers::{encoder, patch_embedding, position_embedding, pooler};
 
 #[derive(Debug, Module)]
 pub struct ViTModel<B: Backend> {
@@ -15,6 +15,7 @@ pub struct ViTModel<B: Backend> {
     pooler: pooler::Pooler<B>,
 }
 
+#[deny(clippy::too_many_arguments)]
 #[derive(Debug, Config)]
 pub struct ViTConfig {
     embedding_dim: usize,
@@ -24,7 +25,7 @@ pub struct ViTConfig {
     hidden_dim: usize,
     num_heads: usize,
     dropout: f64,
-    num_encoder_layers: usize,   
+    num_encoder_layers: usize,
 }
 
 impl ViTConfig {
@@ -33,13 +34,22 @@ impl ViTConfig {
 
         for _ in 0..self.num_encoder_layers {
             encoders.push(
-                encoder::EncoderConfig::new(self.embedding_dim, self.num_heads, self.hidden_dim, self.dropout)
-                .init(device)
+                encoder::EncoderConfig::new(
+                    self.embedding_dim,
+                    self.num_heads,
+                    self.hidden_dim,
+                    self.dropout,
+                )
+                .init(device),
             );
         }
 
-        ViTModel { 
-            patch_embedding: patch_embedding::PatchEmbeddingConfig::new(self.patch_size, self.in_channels).init(device),
+        ViTModel {
+            patch_embedding: patch_embedding::PatchEmbeddingConfig::new(
+                self.patch_size,
+                self.in_channels,
+            )
+            .init(device),
             positional_embedding: position_embedding::PositionalEmbeddingConfig::new().init(device),
             encoders: encoders,
             ln1: LayerNormConfig::new(self.embedding_dim).init(device),
@@ -57,8 +67,7 @@ impl<B: Backend> ViTModel<B> {
 
         for lyr in self.encoders.clone() {
             x = lyr.forward(x);
-        };
-
-        return x
+        }
+        return x;
     }
 }

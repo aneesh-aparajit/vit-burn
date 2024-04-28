@@ -1,16 +1,16 @@
-use burn::{
-    config::Config, 
-    module::Module, 
-    nn::{Dropout, DropoutConfig, Linear, LinearConfig}, 
-    tensor::{backend::Backend, Tensor}
-};
 use super::attention::{SelfAttention, SelfAttentionConfig};
+use burn::{
+    config::Config,
+    module::Module,
+    nn::{Dropout, DropoutConfig, Linear, LinearConfig},
+    tensor::{backend::Backend, Tensor},
+};
 
 #[derive(Debug, Module)]
 pub struct MultiHeadAttention<B: Backend> {
     self_attn: Vec<SelfAttention<B>>,
     output: Linear<B>,
-    dropout: Dropout
+    dropout: Dropout,
 }
 
 #[derive(Debug, Config)]
@@ -18,8 +18,8 @@ pub struct MultiHeadAttentionConfig {
     num_heads: usize,
     embedding_dim: usize,
     head_dim: usize,
-    #[config(default="0.0")]
-    dropout: f64
+    #[config(default = "0.0")]
+    dropout: f64,
 }
 
 impl MultiHeadAttentionConfig {
@@ -27,10 +27,13 @@ impl MultiHeadAttentionConfig {
         let mut attns: Vec<SelfAttention<B>> = vec![];
 
         for _ in 0..self.num_heads {
-            attns.push(SelfAttentionConfig::new(self.head_dim, self.embedding_dim, self.dropout).init(device));
+            attns.push(
+                SelfAttentionConfig::new(self.head_dim, self.embedding_dim, self.dropout)
+                    .init(device),
+            );
         }
 
-        MultiHeadAttention { 
+        MultiHeadAttention {
             self_attn: attns,
             output: LinearConfig::new(self.embedding_dim, self.embedding_dim).init(device),
             dropout: DropoutConfig::new(self.dropout).init(),
@@ -43,9 +46,10 @@ impl<B: Backend> MultiHeadAttention<B> {
         let mut head_outputs = vec![];
         for i in 0..self.self_attn.len() {
             head_outputs.push(self.self_attn[i].clone().forward(inputs.clone()));
-        };
+        }
         let output = Tensor::cat(head_outputs, 2);
         let output = self.output.forward(output);
         self.dropout.forward(output)
     }
 }
+

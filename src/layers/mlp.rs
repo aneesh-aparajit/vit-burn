@@ -1,8 +1,8 @@
 use burn::{
-    config::Config, 
-    module::Module, 
-    nn::{self, Dropout, DropoutConfig, Linear, LinearConfig}, 
-    tensor::{backend::Backend, Tensor}
+    config::Config,
+    module::Module,
+    nn::{self, Dropout, DropoutConfig, Linear, LinearConfig},
+    tensor::{backend::Backend, Tensor},
 };
 
 #[derive(Debug, Module)]
@@ -15,12 +15,11 @@ pub struct Mlp<B: Backend> {
 
 #[derive(Debug, Config)]
 pub struct MlpConfig {
-    embedding_dim: usize, 
+    embedding_dim: usize,
     hidden_dim: usize,
-    #[config(default="0.0")]
-    dropout: f64
+    #[config(default = "0.0")]
+    dropout: f64,
 }
-
 
 impl MlpConfig {
     pub fn init<B: Backend>(&self, device: &B::Device) -> Mlp<B> {
@@ -38,7 +37,6 @@ impl<B: Backend> Mlp<B> {
         let x = self.activation_fn.forward(self.linear1.forward(inputs));
         let x = self.dropout.forward(x);
         let x = self.linear2.forward(x);
-        return x
+        return x;
     }
 }
-
